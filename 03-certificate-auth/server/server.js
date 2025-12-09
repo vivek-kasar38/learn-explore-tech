@@ -78,7 +78,10 @@ const httpsOptions = {
   cert: fs.readFileSync('/app/certs/server-cert.pem'),
   ca: fs.readFileSync('/app/certs/ca-cert.pem'),
   requestCert: true,  // Request client certificate
-  rejectUnauthorized: false  // We'll handle authorization in middleware
+  // NOTE: rejectUnauthorized is set to false for demo purposes to allow custom middleware
+  // to handle authorization logic and provide educational error messages.
+  // In production, set this to true for automatic TLS-level rejection.
+  rejectUnauthorized: false  // We'll handle authorization in middleware for demo clarity
 };
 
 // Create HTTPS server

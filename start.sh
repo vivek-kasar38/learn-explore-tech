@@ -79,3 +79,4 @@ echo "║  docker-compose ps              - List running services            ║
 echo "║  docker-compose down            - Stop all services                ║"
 echo "║  ./start.sh                     - Run this script again            ║"
 echo "╚════════════════════════════════════════════════════════════════════╝"
+

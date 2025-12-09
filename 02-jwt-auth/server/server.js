@@ -67,6 +67,8 @@ app.get('/', (req, res) => {
 });
 
 // Login endpoint - returns JWT token
+// NOTE: In production, add rate limiting to prevent brute force attacks
+// For demo/learning purposes, rate limiting is omitted for simplicity
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
 
