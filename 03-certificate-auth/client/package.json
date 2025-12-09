@@ -1,0 +1,12 @@
+{
+  "name": "cert-auth-client",
+  "version": "1.0.0",
+  "description": "Certificate Authentication Client",
+  "main": "client.js",
+  "scripts": {
+    "start": "node client.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0"
+  }
+}

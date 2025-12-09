@@ -1,0 +1,102 @@
+version: '3.8'
+
+services:
+  # ============================================
+  # 1. SIMPLE BASIC AUTHENTICATION
+  # ============================================
+  simple-auth-server:
+    build:
+      context: ./01-simple-auth/server
+      dockerfile: Dockerfile
+    container_name: simple-auth-server
+    ports:
+      - "3000:3000"
+    networks:
+      - auth-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  simple-auth-client:
+    build:
+      context: ./01-simple-auth/client
+      dockerfile: Dockerfile
+    container_name: simple-auth-client
+    depends_on:
+      simple-auth-server:
+        condition: service_healthy
+    environment:
+      - SERVER_URL=http://simple-auth-server:3000
+    networks:
+      - auth-network
+
+  # ============================================
+  # 2. JWT AUTHENTICATION
+  # ============================================
+  jwt-auth-server:
+    build:
+      context: ./02-jwt-auth/server
+      dockerfile: Dockerfile
+    container_name: jwt-auth-server
+    ports:
+      - "3001:3001"
+    environment:
+      - JWT_SECRET=demo-secret-key-change-in-production
+    networks:
+      - auth-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3001/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  jwt-auth-client:
+    build:
+      context: ./02-jwt-auth/client
+      dockerfile: Dockerfile
+    container_name: jwt-auth-client
+    depends_on:
+      jwt-auth-server:
+        condition: service_healthy
+    environment:
+      - SERVER_URL=http://jwt-auth-server:3001
+    networks:
+      - auth-network
+
+  # ============================================
+  # 3. CERTIFICATE-BASED AUTHENTICATION (mTLS)
+  # ============================================
+  cert-auth-server:
+    build:
+      context: ./03-certificate-auth
+      dockerfile: server/Dockerfile
+    container_name: cert-auth-server
+    ports:
+      - "3002:3002"
+    networks:
+      - auth-network
+    volumes:
+      - cert-data:/app/certs
+
+  cert-auth-client:
+    build:
+      context: ./03-certificate-auth
+      dockerfile: client/Dockerfile
+    container_name: cert-auth-client
+    depends_on:
+      - cert-auth-server
+    environment:
+      - SERVER_URL=https://cert-auth-server:3002
+    networks:
+      - auth-network
+    volumes:
+      - cert-data:/app/certs
+
+networks:
+  auth-network:
+    driver: bridge
+
+volumes:
+  cert-data:
